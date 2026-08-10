@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Dashboard — Comet Webs</title>
+  <meta name="description" content="Submit your website request to Comet Webs" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .client-container {
+      min-height: 100vh;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .client-card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(7, 3, 26, 0.95);
+      border: var(--border-bright);
+      border-radius: var(--radius-xl);
+      padding: 3rem;
+      box-shadow: 0 0 40px rgba(124, 58, 237, 0.15);
+    }
+
+    .client-card__header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .client-card__logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .client-card__title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--star-white);
+      margin-bottom: 0.5rem;
+    }
+
+    .client-card__subtitle {
+      color: var(--star-dim);
+      font-size: 0.9rem;
+    }
+
+    .client-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      color: var(--star-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 0.85rem 1rem;
+      background: rgba(19, 15, 58, 0.6);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: var(--radius-sm);
+      color: var(--star-white);
+      font-size: 0.95rem;
+      transition: all var(--t-med);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--nebula-purple);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+    }
+
+    .form-group select option {
+      background: rgba(7, 3, 26, 0.95);
+      color: var(--star-white);
+    }
+
+    .form-group input::placeholder {
+      color: var(--star-faint);
+    }
+
+    .client-form__submit {
+      margin-top: 0.5rem;
+    }
+
+    .client-form__message {
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      text-align: center;
+      display: none;
+    }
+
+    .client-form__message--error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .client-form__message--success {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .user-info {
+      background: rgba(19, 15, 58, 0.4);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info__email {
+      color: var(--star-white);
+      font-size: 0.9rem;
+    }
+
+    .user-info__logout {
+      color: var(--star-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color var(--t-med);
+    }
+
+    .user-info__logout:hover {
+      color: #fca5a5;
+    }
+
+    .existing-request {
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .existing-request__icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .existing-request__title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--star-white);
+      margin-bottom: 0.5rem;
+    }
+
+    .existing-request__status {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: 100px;
+      color: #fde047;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+
+    .existing-request__desc {
+      color: var(--star-dim);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .nav-links a {
+      color: var(--comet-cyan);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--t-med);
+    }
+
+    .nav-links a:hover {
+      color: var(--nebula-purple);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--star-dim);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(124, 58, 237, 0.3);
+      border-top-color: var(--nebula-purple);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield -->
+  <canvas id="starfield-canvas"></canvas>
+
+  <div class="client-container">
+    <div class="client-card">
+      <div class="client-card__header">
+        <img src="logo.jpeg" alt="Comet Webs Logo" class="client-card__logo" />
+        <h1 class="client-card__title">Client Dashboard</h1>
+        <p class="client-card__subtitle">Tell us about your business</p>
+      </div>
+
+      <div id="loadingState" class="loading">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+
+      <div id="contentState" style="display: none;">
+        <div class="user-info">
+          <span id="userEmail" class="user-info__email"></span>
+          <a href="#" id="logoutBtn" class="user-info__logout">Sign Out</a>
+        </div>
+
+        <!-- Form for new requests -->
+        <div id="requestFormContainer">
+          <form id="clientForm" class="client-form">
+            <div class="form-group">
+              <label for="businessName">Business Name *</label>
+              <input 
+                type="text" 
+                id="businessName" 
+                placeholder="e.g., Acme Corporation" 
+                required 
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="businessType">Business Type *</label>
+              <select id="businessType" required>
+                <option value="">Select your business type</option>
+                <option value="retail">Retail / E-commerce</option>
+                <option value="restaurant">Restaurant / Cafe</option>
+                <option value="service">Service Business</option>
+                <option value="professional">Professional Services (Law, Accounting, etc.)</option>
+                <option value="healthcare">Healthcare / Medical</option>
+                <option value="education">Education / Training</option>
+                <option value="real-estate">Real Estate</option>
+                <option value="technology">Technology / Software</option>
+                <option value="creative">Creative Agency / Studio</option>
+                <option value="nonprofit">Non-Profit / NGO</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="mobileNumber">Mobile Number *</label>
+              <input 
+                type="tel" 
+                id="mobileNumber" 
+                placeholder="+1 (555) 123-4567" 
+                required 
+                pattern="[+]?[0-9\s\-\(\)]+"
+              />
+            </div>
+
+            <div id="formMessage" class="client-form__message"></div>
+
+            <button type="submit" class="btn btn--primary client-form__submit">
+              Submit Request
+            </button>
+          </form>
+        </div>
+
+        <!-- Display existing request -->
+        <div id="existingRequestContainer" style="display: none;">
+          <div class="existing-request">
+            <div class="existing-request__icon">📋</div>
+            <h2 class="existing-request__title">Request Already Submitted</h2>
+            <div id="requestStatus" class="existing-request__status">Pending Review</div>
+            <p class="existing-request__desc">
+              We've received your request and will contact you soon. 
+              Our team will review your requirements and get back to you at the provided mobile number.
+            </p>
+          </div>
+        </div>
+
+        <div class="nav-links">
+          <a href="index.html">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-auth.js"></script>
+  <script src="main.js"></script>
+  <script>
+    'use strict';
+
+    const loadingState = document.getElementById('loadingState');
+    const contentState = document.getElementById('contentState');
+    const requestFormContainer = document.getElementById('requestFormContainer');
+    const existingRequestContainer = document.getElementById('existingRequestContainer');
+    const userEmailEl = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const clientForm = document.getElementById('clientForm');
+    const formMessage = document.getElementById('formMessage');
+    const requestStatus = document.getElementById('requestStatus');
+
+    // Check authentication on load
+    async function init() {
+      const isAuthenticated = await window.CometAuth.requireAuth('/login.html');
+      
+      if (!isAuthenticated) {
+        return;
+      }
+
+      // Show user email
+      const user = window.CometAuth.getCurrentUser();
+      userEmailEl.textContent = user.email;
+
+      // Check for existing request
+      const existingRequest = await window.CometAuth.getCurrentUserRequest();
+      
+      loadingState.style.display = 'none';
+      contentState.style.display = 'block';
+
+      if (existingRequest) {
+        requestFormContainer.style.display = 'none';
+        existingRequestContainer.style.display = 'block';
+        
+        // Update status display
+        const statusMap = {
+          'pending': 'Pending Review',
+          'in-progress': 'In Progress',
+          'completed': 'Completed',
+          'contacted': 'Contacted'
+        };
+        requestStatus.textContent = statusMap[existingRequest.status] || existingRequest.status;
+      }
+    }
+
+    // Handle logout
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const result = await window.CometAuth.signOut();
+      if (result.success) {
+        window.location.href = '/index.html';
+      }
+    });
+
+    // Handle form submission
+    clientForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const businessName = document.getElementById('businessName').value;
+      const businessType = document.getElementById('businessType').value;
+      const mobileNumber = document.getElementById('mobileNumber').value;
+
+      formMessage.style.display = 'none';
+      formMessage.className = 'client-form__message';
+
+      const result = await window.CometAuth.submitClientRequest({
+        businessName,
+        businessType,
+        mobileNumber
+      });
+
+      if (result.success) {
+        formMessage.textContent = 'Request submitted successfully! Redirecting...';
+        formMessage.classList.add('client-form__message--success');
+        formMessage.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = '/thank-you.html';
+        }, 1500);
+      } else {
+        formMessage.textContent = result.error || 'Failed to submit request. Please try again.';
+        formMessage.classList.add('client-form__message--error');
+        formMessage.style.display = 'block';
+      }
+    });
+
+    // Initialize
+    init();
+  </script>
+</body>
+</html>
