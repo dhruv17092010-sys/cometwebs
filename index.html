@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="google-site-verification" content="bI02-tuv36x5OBbS_DXR5e2eeuU6lot9iIcKuVcIhEo" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comet Webs — Web Design Agency</title>
+  <meta name="description" content="Comet Webs builds blazing-fast, stunning websites that market your business 24/7. Launch with the speed of a comet." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Home-specific styles ── */
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* Animated gradient background simulating a space video */
+    .video-placeholder__bg {
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 30%, rgba(59,130,246,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 20% 70%, rgba(124,58,237,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(6,182,212,0.12) 0%, transparent 60%),
+        linear-gradient(160deg, #03010a 0%, #07031a 40%, #0d0726 70%, #03010a 100%);
+      animation: nebula-shift 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes nebula-shift {
+      0%   { filter: hue-rotate(0deg) brightness(1); }
+      50%  { filter: hue-rotate(20deg) brightness(1.1); }
+      100% { filter: hue-rotate(-10deg) brightness(0.95); }
+    }
+
+    /* Orbiting ring decoration */
+    .hero-ring {
+      position: absolute;
+      width: 700px; height: 700px;
+      border: 1px solid rgba(124,58,237,0.1);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: spin-slow 40s linear infinite;
+      z-index: 1;
+    }
+    .hero-ring-2 {
+      width: 500px; height: 500px;
+      border-color: rgba(59,130,246,0.08);
+      animation-duration: 28s;
+      animation-direction: reverse;
+    }
+    .hero-ring::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--nebula-violet);
+      box-shadow: 0 0 15px var(--nebula-violet);
+      margin-top: -4px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(6,182,212,0.08);
+      border: 1px solid rgba(6,182,212,0.25);
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--comet-cyan);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero__actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 2.5rem;
+    }
+
+    .hero__scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--star-faint);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: float-up 2.5s ease-in-out infinite;
+    }
+
+    .hero__scroll-arrow {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(180deg, var(--comet-cyan), transparent);
+      border-radius: 1px;
+    }
+
+    /* ── Benefits marquee section ── */
+    .marquee-section {
+      padding: 5rem 0;
+      background: linear-gradient(180deg, transparent, rgba(19,15,58,0.3), transparent);
+    }
+
+    .marquee-section__header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Article section ── */
+    .article-section {
+      padding: 7rem 0;
+    }
+
+    .article-section .article-block__text h2 {
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      margin-bottom: 1.2rem;
+    }
+
+    .article-highlight {
+      background: rgba(124,58,237,0.1);
+      border-left: 3px solid var(--nebula-purple);
+      padding: 1rem 1.5rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 1.5rem 0;
+      color: var(--star-dim);
+      font-style: italic;
+      font-size: 1rem;
+    }
+
+    /* ── Why us section ── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      .why-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .why-grid { grid-template-columns: 1fr; }
+      .hero-ring, .hero-ring-2 { display: none; }
+    }
+
+    /* ── Process section ── */
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(124,58,237,0.15);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 3rem;
+    }
+
+    .process-step {
+      background: rgba(7,3,26,0.9);
+      padding: 2.5rem 2rem;
+      position: relative;
+      transition: background var(--t-med);
+    }
+
+    .process-step:hover {
+      background: rgba(19,15,58,0.9);
+    }
+
+    .process-step__num {
+      font-family: var(--font-mono);
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+      background: var(--grad-comet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0.3;
+      margin-bottom: 1rem;
+    }
+
+    .process-step__title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--star-white);
+    }
+
+    .process-step__desc {
+      color: var(--star-dim);
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .process-steps { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .process-steps { grid-template-columns: 1fr; }
+    }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(59,130,246,0.1), rgba(6,182,212,0.08));
+      border: var(--border-bright);
+      border-radius: var(--radius-xl);
+      padding: 5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 60%);
+      animation: pulse-glow 8s ease-in-out infinite;
+    }
+
+    .cta-banner > * { position: relative; z-index: 1; }
+    .cta-banner h2 { margin-bottom: 1rem; }
+    .cta-banner p  { color: var(--star-dim); margin-bottom: 2.5rem; max-width: 560px; margin-left: auto; margin-right: auto; }
+    .cta-banner__btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield-canvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img src="logo.jpeg" alt="Comet Webs Logo" />
+      <span class="nav__logo-text">COMET WEBS</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a href="client.html" target="_blank" class="nav__cta btn">Get Started</a>
+    <button class="nav__hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="nav__mobile">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <a href="client.html" target="_blank" class="nav__cta btn">Get Started →</a>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="video-hero">
+  <!-- Simulated video background -->
+  <div class="video-placeholder">
+    <div class="video-placeholder__bg"></div>
+  </div>
+  <div class="video-hero__overlay"></div>
+
+  <!-- Decorative rings -->
+  <div class="hero-ring"></div>
+  <div class="hero-ring hero-ring-2"></div>
+
+  <div class="video-hero__content">
+    <div class="hero-badge anim-fade-in">
+      <span class="glow-dot"></span>
+      Web Design &amp; Development Studio
+    </div>
+
+    <h1 class="h-display anim-fade-up delay-1">
+      Your Website.<br/>
+      <span class="text-gradient">Your Launch Pad.</span>
+    </h1>
+
+    <p class="anim-fade-up delay-2" style="max-width:620px; margin: 1.5rem auto 0; color: var(--star-dim); font-size: 1.1rem;">
+      Comet Webs designs blazing-fast, conversion-driven websites that work as your 24/7 marketing engine — built for impact, crafted for growth.
+    </p>
+
+    <div class="hero__actions">
+      <a href="client.html" target="_blank" class="btn btn--primary btn--lg anim-fade-up delay-3">
+        🚀 Launch My Website
+      </a>
+      <a href="explore.html" class="btn btn--secondary btn--lg anim-fade-up delay-4">
+        View Our Work
+      </a>
+    </div>
+  </div>
+
+  <div class="hero__scroll-hint">
+    <span>scroll</span>
+    <div class="hero__scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ STATS ═══════════════════ -->
+<section class="section-pad" style="padding-top: 4rem; padding-bottom: 4rem;">
+  <div class="container">
+    <div class="stats-row reveal">
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="100" data-suffix="%">0+</div>
+        <div class="stat-item__label">Orignal Websites </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="100" data-suffix="%">0%</div>
+        <div class="stat-item__label">Client Satisfaction</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="60" data-suffix="+">0x</div>
+        <div class="stat-item__label">Businesses Supported</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="7" data-suffix=" Days">0 Days</div>
+        <div class="stat-item__label"> Delivery Time</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FLOATING BENEFIT CARDS (MARQUEE) ═══════════════════ -->
+<section class="marquee-section">
+  <div class="container">
+    <div class="marquee-section__header reveal">
+      <div class="eyebrow eyebrow-center">Why Choose Comet Webs</div>
+      <h2 class="h-section">Benefits That <span class="text-gradient">Move Your Business</span></h2>
+      <p style="color: var(--star-dim); margin-top: 1rem; max-width: 520px; margin-left: auto; margin-right: auto;">
+        Every website we build is engineered to grow your business, not just look pretty.
+      </p>
+    </div>
+  </div>
+
+  <!-- Marquee row 1 — right to left -->
+  <div class="marquee-wrap" style="margin-top: 3rem;">
+    <div class="marquee-track">
+      <!-- Cards duplicated for seamless loop -->
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🌐</span>
+        <div class="marquee-card__title">24/7 Online Presence</div>
+        <div class="marquee-card__desc">Your website works around the clock attracting customers even while you sleep.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">📈</span>
+        <div class="marquee-card__title">Boosts Credibility</div>
+        <div class="marquee-card__desc">75% of customers judge a business's credibility by its website. Look professional instantly.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🎯</span>
+        <div class="marquee-card__title">Targeted Marketing</div>
+        <div class="marquee-card__desc">Reach the exact audience that needs your service with SEO-optimised pages.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">💬</span>
+        <div class="marquee-card__title">Direct Customer Calls</div>
+        <div class="marquee-card__desc">WhatsApp, call, and contact integrations turn visitors into paying clients in seconds.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">📱</span>
+        <div class="marquee-card__title">Mobile-First Design</div>
+        <div class="marquee-card__desc">60%+ of web traffic is mobile. We ensure your site shines on every screen size.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">⚡</span>
+        <div class="marquee-card__title">Lightning Speed</div>
+        <div class="marquee-card__desc">Fast-loading pages reduce bounce rates and rank higher on Google — more visits, more revenue.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🔍</span>
+        <div class="marquee-card__title">SEO Built-In</div>
+        <div class="marquee-card__desc">Every page structured for search engines so your customers find you before competitors.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🏆</span>
+        <div class="marquee-card__title">Stand Out Locally</div>
+        <div class="marquee-card__desc">Dominate local search results and become the go-to business in your area.</div>
+      </div>
+      <!-- Duplicate for infinite loop -->
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🌐</span>
+        <div class="marquee-card__title">24/7 Online Presence</div>
+        <div class="marquee-card__desc">Your website works around the clock attracting customers even while you sleep.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">📈</span>
+        <div class="marquee-card__title">Boosts Credibility</div>
+        <div class="marquee-card__desc">75% of customers judge a business's credibility by its website. Look professional instantly.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🎯</span>
+        <div class="marquee-card__title">Targeted Marketing</div>
+        <div class="marquee-card__desc">Reach the exact audience that needs your service with SEO-optimised pages.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">💬</span>
+        <div class="marquee-card__title">Direct Customer Calls</div>
+        <div class="marquee-card__desc">WhatsApp, call, and contact integrations turn visitors into paying clients in seconds.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">📱</span>
+        <div class="marquee-card__title">Mobile-First Design</div>
+        <div class="marquee-card__desc">60%+ of web traffic is mobile. We ensure your site shines on every screen size.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">⚡</span>
+        <div class="marquee-card__title">Lightning Speed</div>
+        <div class="marquee-card__desc">Fast-loading pages reduce bounce rates and rank higher on Google — more visits, more revenue.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🔍</span>
+        <div class="marquee-card__title">SEO Built-In</div>
+        <div class="marquee-card__desc">Every page structured for search engines so your customers find you before competitors.</div>
+      </div>
+      <div class="marquee-card">
+        <span class="marquee-card__emoji">🏆</span>
+        <div class="marquee-card__title">Stand Out Locally</div>
+        <div class="marquee-card__desc">Dominate local search results and become the go-to business in your area.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════ ARTICLE: IT'S NOT JUST A WEBSITE ═══════════════════ -->
+<section class="article-section">
+  <div class="container">
+    <div class="article-block">
+      <div class="article-block__img-wrap reveal-left">
+        <div class="article-block__img-overlay"></div>
+        <img
+          src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+          alt="Business growth analytics dashboard showing website marketing performance"
+          style="
+            width: 100%; height: 100%; min-height: 380px;
+            object-fit: cover; object-position: center;
+            display: block; border-radius: inherit;
+          "
+          loading="lazy"
+        />
+      </div>
+
+      <div class="article-block__text reveal-right">
+        <div class="eyebrow">The Comet Webs Insight</div>
+        <h2 class="h-section">IT'S NOT JUST A WEBSITE,<br/><span class="text-gradient">IT'S MARKETING.</span></h2>
+
+        <p>Most business owners think a website is a digital business card — a place to park your name and number. That thinking is costing you customers every single day.</p>
+
+        <div class="article-highlight">
+          "A well-built website is your best salesperson — it never sleeps, never takes a day off, and works for you 24 hours a day, 365 days a year."
+        </div>
+
+        <p>At Comet Webs, we build websites engineered as complete marketing systems. Every element — from headlines to button colours to page speed — is designed to convert visitors into customers.</p>
+
+        <ul>
+          <li>SEO-optimised structure so Google finds you first</li>
+          <li>Conversion-focused layouts that guide users to contact you</li>
+          <li>Trust signals that turn sceptics into buyers</li>
+          <li>Speed-optimised code — Google rewards fast websites</li>
+          <li>Mobile-perfect design for the 60% who browse on phone</li>
+          <li>Analytics-ready so you can track every rupee of ROI</li>
+        </ul>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="client.html" target="_blank" class="btn btn--primary">🚀 Start Today</a>
+          <a href="products.html" class="btn btn--secondary">View Products</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════ WHY COMET WEBS ═══════════════════ -->
+<section class="section-pad">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="eyebrow eyebrow-center">Our Edge</div>
+      <h2 class="h-section">Why Businesses <span class="text-gradient">Choose Us</span></h2>
+    </div>
+
+    <div class="why-grid">
+      <div class="card reveal" data-delay="1">
+        <div class="card__icon">⚡</div>
+        <div class="card__title">Blazing Fast Delivery</div>
+        <div class="card__body">Most projects delivered in 5–10 days. We move at the speed of your ambition, without cutting corners.</div>
+      </div>
+      <div class="card reveal" data-delay="2">
+        <div class="card__icon">🎨</div>
+        <div class="card__title">100% Custom Design</div>
+        <div class="card__body">Every website is handcrafted to your brand — no templates, no copy-paste, no generic outputs.</div>
+      </div>
+      <div class="card reveal" data-delay="3">
+        <div class="card__icon">📊</div>
+        <div class="card__title">Built for Conversions</div>
+        <div class="card__body">Our designs are not just beautiful — they're strategically engineered to turn visitors into buyers.</div>
+      </div>
+      <div class="card reveal" data-delay="1">
+        <div class="card__icon">🛡️</div>
+        <div class="card__title">Affordable & Transparent</div>
+        <div class="card__body">Crystal clear pricing, no hidden charges. Professional-grade websites at prices that make sense.</div>
+      </div>
+      <div class="card reveal" data-delay="2">
+        <div class="card__icon">💬</div>
+        <div class="card__title">Direct Support via WhatsApp</div>
+        <div class="card__body">Talk directly with your designer. No ticketing systems, no waiting — instant response on WhatsApp.</div>
+      </div>
+      <div class="card reveal" data-delay="3">
+        <div class="card__icon">🔄</div>
+        <div class="card__title">Post-Launch Support</div>
+        <div class="card__body">We don't disappear after launch. Revisions, updates, and guidance included so your site stays sharp.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ PROCESS ═══════════════════ -->
+<section class="section-pad" style="padding-top: 0;">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="eyebrow eyebrow-center">Our Process</div>
+      <h2 class="h-section">From Idea to <span class="text-gradient">Live in Days</span></h2>
+    </div>
+    <div class="process-steps reveal" data-delay="1">
+      <div class="process-step">
+        <div class="process-step__num">01</div>
+        <div class="process-step__title">Discovery Call</div>
+        <div class="process-step__desc">We understand your business, goals, and audience over a quick WhatsApp chat.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-step__num">02</div>
+        <div class="process-step__title">Design & Build</div>
+        <div class="process-step__desc">Our team crafts your custom website — pixel-perfect and performance-tuned.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-step__num">03</div>
+        <div class="process-step__title">Review & Refine</div>
+        <div class="process-step__desc">You review every page. We refine until you're 100% satisfied. No questions asked.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-step__num">04</div>
+        <div class="process-step__title">Launch 🚀</div>
+        <div class="process-step__desc">Your website goes live and starts working as your 24/7 marketing machine.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ CTA BANNER ═══════════════════ -->
+<section class="section-pad">
+  <div class="container">
+    <div class="cta-banner reveal">
+      <h2 class="h-section">Ready to <span class="text-gradient">Launch?</span></h2>
+      <p>Join businesses that trusted Comet Webs to build their digital presence. Your website is one conversation away.</p>
+      <div class="cta-banner__btns">
+        <a href="client.html" target="_blank" class="btn btn--whatsapp btn--lg">
+          💬 Chat on WhatsApp
+        </a>
+        <a href="products.html" class="btn btn--secondary btn--lg">See Pricing</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <img src="logo.jpeg" alt="Comet Webs" />
+        <p>We build websites that work as your 24/7 marketing engine — blazing fast, conversion-driven, and uniquely yours.</p>
+       
+      </div>
+      <div class="footer__col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="explore.html">Explore Work</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="about.html">About Us</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="products.html">Personalized Webs</a></li>
+          <li><a href="products.html">Ready-Made Webs</a></li>
+          <li><a href="client.html" target="_blank">SEO Optimization</a></li>
+          <li><a href="client.html" target="_blank">Maintenance</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="client.html" target="_blank">WhatsApp Us</a></li>
+          <li><a href="mailto:hello@cometwebs.in">hello@cometwebs.in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 Comet Webs. All rights reserved.</span>
+      <span style="display:flex; align-items:center; gap: 0.4rem;">
+        Built with <span style="color: var(--nebula-violet);">♥</span> &amp; cosmic energy
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Comet Webs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── About-page specific ── */
+
+    /* Quote hero styling */
+    .quote-hero {
+      position: relative;
+      min-height: 78vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding-top: var(--nav-h);
+    }
+
+    .quote-hero__bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 40% 40%, rgba(124,58,237,0.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 65%, rgba(59,130,246,0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 15% 80%, rgba(6,182,212,0.12) 0%, transparent 45%),
+        var(--grad-dark);
+      z-index: 0;
+    }
+
+    /* Orbiting dots animation */
+    .orbit-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      pointer-events: none;
+    }
+    .orbit-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      top: 50%;
+      transform-origin: 0 0;
+    }
+
+    .quote-hero__content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      max-width: 900px;
+    }
+
+    /* Big decorative quote mark */
+    .big-quote {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 12vw, 10rem);
+      line-height: 0.7;
+      background: var(--grad-comet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0.4;
+      display: block;
+      margin-bottom: -1rem;
+      user-select: none;
+    }
+
+    .hero-quote-text {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4.5vw, 3.8rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      color: var(--star-white);
+      margin-bottom: 1rem;
+    }
+
+    .hero-quote-attr {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--comet-cyan);
+    }
+
+    /* Scroll indicator */
+    .scroll-cue {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 3rem;
+    }
+    .scroll-cue span {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--star-faint);
+      text-transform: uppercase;
+    }
+    .scroll-cue__line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(180deg, var(--comet-cyan), transparent);
+      animation: scroll-line 2s ease-in-out infinite;
+    }
+    @keyframes scroll-line {
+      0%, 100% { opacity: 0.5; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.2); }
+    }
+
+    /* Mission article */
+    .mission-article {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .mission-img-wrap {
+      position: relative;
+    }
+
+    .mission-img-frame {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      background: linear-gradient(135deg,#0d0726 0%, #1a1450 40%,#130f3a 100%);
+      border: var(--border-dim);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Decorative visual inside image frame */
+    .mission-visual {
+      position: relative;
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* Floating card decorations */
+    .mission-float-card {
+      position: absolute;
+      background: rgba(13,7,38,0.85);
+      border: var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Value cards */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .value-card {
+      background: rgba(13,7,38,0.6);
+      border: var(--border-dim);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: transform var(--t-med) var(--ease-bounce),
+                  border-color var(--t-med),
+                  box-shadow var(--t-med);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+    .value-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--grad-comet);
+      transform: scaleX(0);
+      transition: transform var(--t-med) var(--ease-bounce);
+    }
+    .value-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(124,58,237,0.45);
+      box-shadow: var(--shadow-card);
+    }
+    .value-card:hover::before { transform: scaleX(1); }
+    .value-card__emoji { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+    .value-card__title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .value-card__desc {
+      color: var(--star-dim);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--comet-cyan), var(--nebula-purple), transparent);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--space-void);
+      border: 2px solid var(--comet-cyan);
+      box-shadow: 0 0 10px rgba(6,182,212,0.5);
+    }
+    .timeline-year {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: var(--comet-cyan);
+      margin-bottom: 0.3rem;
+    }
+    .timeline-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .timeline-desc {
+      color: var(--star-dim);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    /* CTA section */
+    .about-cta {
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(59,130,246,0.1));
+      border: var(--border-dim);
+      border-radius: var(--radius-xl);
+      padding: 5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      .mission-article {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .mission-img-wrap { order: -1; }
+      .mission-img-frame { aspect-ratio: 16/9; }
+    }
+
+    @media (max-width: 768px) {
+      .values-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+    @media (max-width: 600px) {
+      .values-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 400px) {
+      .values-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starfield-canvas"></canvas>
+
+<!-- ── Navigation ── -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img src="logo.jpeg" alt="Comet Webs" />
+      <span class="nav__logo-text">COMET WEBS</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <a href="client.html" target="_blank" class="nav__cta">Get Started</a>
+    <button class="nav__hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="nav__mobile">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <a href="client.html" target="_blank" class="nav__cta">Get Started ↗</a>
+</div>
+
+<!-- ── Quote Hero ── -->
+<section class="quote-hero">
+  <div class="quote-hero__bg"></div>
+
+  <!-- Orbiting ring decorations -->
+  <div class="orbit-ring" style="width:500px;height:500px;border-color:rgba(124,58,237,0.1);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin-slow 60s linear infinite;z-index:1;">
+    <div class="orbit-dot" style="width:8px;height:8px;background:var(--comet-cyan);box-shadow:0 0 12px var(--comet-cyan);transform:translate(-50%,-50%) translateX(250px);"></div>
+  </div>
+  <div class="orbit-ring" style="width:340px;height:340px;border-color:rgba(59,130,246,0.12);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin-slow 40s linear infinite reverse;z-index:1;">
+    <div class="orbit-dot" style="width:5px;height:5px;background:var(--nebula-violet);box-shadow:0 0 8px var(--nebula-violet);transform:translate(-50%,-50%) translateX(170px);"></div>
+  </div>
+  <div class="orbit-ring" style="width:200px;height:200px;border-color:rgba(6,182,212,0.15);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin-slow 25s linear infinite;z-index:1;">
+    <div class="orbit-dot" style="width:4px;height:4px;background:var(--comet-light);box-shadow:0 0 6px var(--comet-light);transform:translate(-50%,-50%) translateX(100px);"></div>
+  </div>
+
+  <div class="quote-hero__content" style="position:relative;z-index:2;">
+    <div class="eyebrow eyebrow-center anim-fade-up" style="margin-bottom:2rem;">Our Origin Story</div>
+    <span class="big-quote anim-fade-in">"</span>
+    <h1 class="hero-quote-text anim-fade-up delay-1">
+      Like the sun,<br>
+      <span class="text-gradient">we were born to rise.</span>
+    </h1>
+    <p class="hero-quote-attr anim-fade-up delay-2">— Chris Cornell</p>
+    <p class="text-dim anim-fade-up delay-3" style="max-width:520px;margin:2rem auto 0;font-size:1.05rem;line-height:1.7;">
+      These words echo the spirit of every business that comes to us. Burning with potential, ready to rise — and needing the digital stage to shine.
+    </p>
+    <div class="scroll-cue anim-fade-up delay-4">
+      <div class="scroll-cue__line"></div>
+      <span>Scroll to explore</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Mission Article ── -->
+<section class="section-pad section-pad--lg">
+  <div class="container">
+    <div class="mission-article">
+
+      <!-- Left: Decorative image panel -->
+      <div class="mission-img-wrap reveal-left">
+        <div class="mission-img-frame">
+          <!-- Abstract visual representing "rising" -->
+          <div class="mission-visual">
+            <!-- Central glow orb -->
+            <div style="position:relative;width:120px;height:120px;">
+              <div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.3),transparent 70%);animation:pulse-glow 4s ease-in-out infinite;"></div>
+              <div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,var(--nebula-purple),var(--comet-blue));display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(124,58,237,0.5),inset 0 1px 0 rgba(255,255,255,0.2);">
+                <img src="logo.jpeg" alt="Comet Webs" style="width:72px;height:72px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 8px rgba(6,182,212,0.6));" />
+              </div>
+            </div>
+
+            <!-- Rising lines -->
+            <div style="display:flex;gap:0.5rem;align-items:flex-end;height:80px;">
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:40%;animation:float-up 3s ease-in-out infinite 0s;"></div>
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:60%;animation:float-up 3s ease-in-out infinite 0.3s;"></div>
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:80%;animation:float-up 3s ease-in-out infinite 0.6s;"></div>
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:100%;animation:float-up 3s ease-in-out infinite 0.9s;"></div>
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:80%;animation:float-up 3s ease-in-out infinite 1.2s;"></div>
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:65%;animation:float-up 3s ease-in-out infinite 1.5s;"></div>
+              <div style="width:8px;border-radius:4px;background:var(--grad-comet);height:45%;animation:float-up 3s ease-in-out infinite 1.8s;"></div>
+            </div>
+
+            <!-- Stats floating cards -->
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+              <div style="background:rgba(13,7,38,0.9);border:var(--border-dim);border-radius:var(--radius-md);padding:0.8rem 1.2rem;text-align:center;backdrop-filter:blur(10px);">
+                <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;background:var(--grad-comet);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-count="100" data-suffix="%">100%</div>
+                <div style="font-size:0.75rem;color:var(--star-faint);font-family:var(--font-display);letter-spacing:0.05em;">Dedication </div>
+              </div>
+              <div style="background:rgba(13,7,38,0.9);border:var(--border-dim);border-radius:var(--radius-md);padding:0.8rem 1.2rem;text-align:center;backdrop-filter:blur(10px);">
+                <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;background:var(--grad-nebula);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-count="100" data-suffix="%">100%</div>
+                <div style="font-size:0.75rem;color:var(--star-faint);font-family:var(--font-display);letter-spacing:0.05em;">Passion</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Border glow effect -->
+          <div style="position:absolute;inset:0;border-radius:var(--radius-xl);border:var(--border-dim);pointer-events:none;box-shadow:inset 0 0 60px rgba(124,58,237,0.08);"></div>
+        </div>
+
+        <!-- Floating accent badge -->
+        <div style="position:absolute;bottom:-1.5rem;right:-1rem;background:linear-gradient(135deg,var(--nebula-purple),var(--comet-blue));border-radius:var(--radius-md);padding:1rem 1.5rem;box-shadow:var(--glow-purple);animation:float-up 4s ease-in-out infinite;">
+          <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.18em;color:rgba(255,255,255,0.7);">BUILT WITH</div>
+          <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:white;">✦ PURPOSE</div>
+        </div>
+      </div>
+
+      <!-- Right: Story text -->
+      <div class="reveal-right">
+        <div class="eyebrow">Our Story</div>
+        <h2 class="h-section" style="margin-bottom:1.5rem;">
+          Like the Sun,<br>
+          <span class="text-gradient">We Were Born to Rise</span>
+        </h2>
+        <p style="color:var(--star-dim);font-size:1.05rem;line-height:1.75;margin-bottom:1.2rem;">
+          Comet Webs was born from a simple but powerful belief: <strong style="color:var(--star-white);">every business, no matter how small, deserves a world-class digital presence.</strong> Too many great businesses stay invisible online — not because they lack vision, but because web design felt too expensive, too complicated, or too slow.
+        </p>
+        <p style="color:var(--star-dim);font-size:1.05rem;line-height:1.75;margin-bottom:1.2rem;">
+          We started Comet Webs to change that. Like a comet blazing across the night sky, we move fast, leave an impression, and light the way for businesses ready to grow.
+        </p>
+        <p style="color:var(--star-dim);font-size:1.05rem;line-height:1.75;margin-bottom:2rem;">
+          From small local shops to growing enterprises, we craft websites that don't just look beautiful — they work hard. Every line of code, every pixel, every button is built to turn visitors into customers.
+        </p>
+
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="client.html" target="_blank" class="btn btn--primary">
+            💬 Start Your Journey
+          </a>
+          <a href="explore.html" class="btn btn--secondary">
+            See Our Work ↗
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Values ── -->
+<section class="section-pad">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3.5rem;" class="reveal">
+      <div class="eyebrow eyebrow-center">What Drives Us</div>
+      <h2 class="h-section">Our Core <span class="text-gradient">Values</span></h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card reveal" data-delay="0">
+        <span class="value-card__emoji">🚀</span>
+        <div class="value-card__title">Speed Without Compromise</div>
+        <div class="value-card__desc">Fast delivery means nothing without quality. We believe you should have both — always.</div>
+      </div>
+      <div class="value-card reveal" data-delay="1">
+        <span class="value-card__emoji">🎯</span>
+        <div class="value-card__title">Results-Driven Design</div>
+        <div class="value-card__desc">Beautiful is a starting point. Every design decision is made to drive real business outcomes.</div>
+      </div>
+      <div class="value-card reveal" data-delay="2">
+        <span class="value-card__emoji">🤝</span>
+        <div class="value-card__title">Client-First Always</div>
+        <div class="value-card__desc">Your success is our success. We listen deeply, communicate openly, and deliver beyond expectations.</div>
+      </div>
+      <div class="value-card reveal" data-delay="1">
+        <span class="value-card__emoji">💡</span>
+        <div class="value-card__title">Innovation at Heart</div>
+        <div class="value-card__desc">We stay ahead of trends so your website stays ahead of competitors — now and into the future.</div>
+      </div>
+      <div class="value-card reveal" data-delay="2">
+        <span class="value-card__emoji">🔒</span>
+        <div class="value-card__title">Reliability You Trust</div>
+        <div class="value-card__desc">We build websites that work — flawlessly, on every device, every time. No shortcuts, no excuses.</div>
+      </div>
+      <div class="value-card reveal" data-delay="3">
+        <span class="value-card__emoji">🌌</span>
+        <div class="value-card__title">Thinking Galactic</div>
+        <div class="value-card__desc">We don't just build pages — we build platforms for your business to grow without limits.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+
+
+<div class="divider"></div>
+
+<!-- ── Stats Banner ── -->
+<section style="position:relative;z-index:2;padding:4rem 0;">
+  <div class="container">
+    <div class="stats-row reveal">
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="100" data-suffix="%">50+</div>
+        <div class="stat-item__label">Orignal Websites</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="60" data-suffix="+">98%</div>
+        <div class="stat-item__label">Business Supported</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="100" data-suffix="%">98%</div>
+        <div class="stat-item__label">Happy Clients</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-item__value" data-count="7">7</div>
+        <div class="stat-item__label"> Days to Launch</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Final CTA ── -->
+<section class="section-pad">
+  <div class="container">
+    <div class="about-cta reveal">
+      <!-- Background glow -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(124,58,237,0.12),transparent 70%);pointer-events:none;"></div>
+      <!-- Comet streak decoration -->
+      <div style="position:absolute;top:30%;left:-5%;width:40%;height:1px;background:linear-gradient(90deg,transparent,rgba(6,182,212,0.4),transparent);transform:rotate(-8deg);pointer-events:none;"></div>
+
+      <div style="position:relative;">
+        <div class="eyebrow eyebrow-center" style="margin-bottom:1.5rem;">Ready to Rise?</div>
+        <h2 class="h-section" style="margin-bottom:1rem;">
+          Your Business Deserves<br>
+          <span class="text-gradient">To Shine Online</span>
+        </h2>
+        <p class="text-dim" style="max-width:500px;margin:0 auto 2.5rem;font-size:1.05rem;line-height:1.7;">
+          Join the businesses that chose Comet Webs and never looked back. Let's build something extraordinary together.
+        </p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+          <a href="client.html" target="_blank" class="btn btn--whatsapp btn--lg">
+            💬 Let's Get Started
+          </a>
+          <a href="products.html" class="btn btn--secondary btn--lg">
+            View Products
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <img src="logo.jpeg" alt="Comet Webs" />
+        <p>We build fast, beautiful, high-converting websites that rocket your business to the top. From concept to launch — we do it all.</p>
+      </div>
+      <div class="footer__col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="explore.html">Explore</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Products</h4>
+        <ul>
+          <li><a href="products.html#personalized">Personalized Webs</a></li>
+          <li><a href="products.html#readymade">Ready Made Webs</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="https://wa.me/919687608826" target="_blank">WhatsApp Us</a></li>
+          <li><a href="tel:+919687608826">+91 96876 08826</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 Comet Webs. All rights reserved.</span>
+      <span style="display:flex;align-items:center;gap:0.5rem;"><span class="glow-dot"></span> Crafted with cosmic precision.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

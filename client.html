@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Started — Comet Webs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Client Form Page Styles ── */
+
+    .form-hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--nav-h) + 3rem) 1.5rem 4rem;
+      position: relative;
+    }
+
+    /* Ambient glow blobs */
+    .form-hero::before {
+      content: '';
+      position: fixed;
+      top: 20%;
+      left: -15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 70%);
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    .form-hero::after {
+      content: '';
+      position: fixed;
+      bottom: 15%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      border-radius: 50%;
+    }
+
+    .form-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 560px;
+      background: rgba(13, 7, 38, 0.85);
+      border: 1px solid rgba(124,58,237,0.28);
+      border-radius: var(--radius-xl);
+      padding: 3rem 3rem 3.5rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.1), var(--glow-purple);
+      animation: fade-up 0.6s var(--ease-smooth) both;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-card__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--comet-cyan);
+      background: rgba(6,182,212,0.08);
+      border: 1px solid rgba(6,182,212,0.25);
+      padding: 0.32rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-card__title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 4vw, 2.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--star-white);
+      margin-bottom: 0.6rem;
+    }
+
+    .form-card__sub {
+      color: var(--star-dim);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 2.2rem;
+    }
+
+    /* Divider */
+    .form-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124,58,237,0.35), transparent);
+      margin-bottom: 2rem;
+    }
+
+    /* Field group */
+    .field {
+      margin-bottom: 1.4rem;
+    }
+
+    .field label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--star-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .field label span.req {
+      color: var(--comet-cyan);
+      margin-left: 2px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(124,58,237,0.28);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1.1rem;
+      color: var(--star-white);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field input::placeholder {
+      color: var(--star-faint);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(124,58,237,0.7);
+      background: rgba(124,58,237,0.06);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    }
+
+    .field input.error,
+    .field select.error {
+      border-color: rgba(239,68,68,0.6);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+    }
+
+    /* Select arrow */
+    .field .select-wrap {
+      position: relative;
+    }
+
+    .field .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--nebula-purple);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .field select option {
+      background: #130f3a;
+      color: var(--star-white);
+    }
+
+    /* Error message */
+    .field-error {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: #f87171;
+      margin-top: 0.35rem;
+      letter-spacing: 0.04em;
+    }
+    .field-error.visible { display: block; }
+
+    /* Phone prefix */
+    .phone-wrap {
+      display: flex;
+      gap: 0;
+    }
+    .phone-prefix {
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.28);
+      border-right: none;
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--comet-cyan);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .phone-wrap input {
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      margin-top: 0.8rem;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--nebula-purple), var(--comet-blue));
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--t-fast), box-shadow var(--t-fast);
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+      opacity: 0;
+      transition: opacity var(--t-fast);
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124,58,237,0.55);
+    }
+    .btn-submit:hover::before { opacity: 1; }
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-submit .btn-icon { margin-right: 0.5rem; font-size: 1.1rem; }
+
+    /* WhatsApp note below button */
+    .whatsapp-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--star-faint);
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+    }
+
+    .whatsapp-note .wa-icon {
+      width: 18px;
+      height: 18px;
+      fill: #25d366;
+      flex-shrink: 0;
+    }
+
+    /* Privacy note */
+    .privacy-note {
+      margin-top: 1.8rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.75rem;
+      color: var(--star-faint);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 620px) {
+      .form-card {
+        padding: 2rem 1.5rem 2.5rem;
+        border-radius: var(--radius-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield-canvas"></canvas>
+
+<!-- ── Navigation (no client link shown) ── -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img src="logo.jpeg" alt="Comet Webs" />
+      <span class="nav__logo-text">COMET WEBS</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    
+    <button class="nav__hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu (no client link) -->
+<div class="nav__mobile">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <a href="https://wa.me/919687608826" target="_blank" class="nav__cta">Get Started ↗</a>
+</div>
+
+<!-- ── Contact Form ── -->
+<section class="form-hero">
+  <div class="form-card">
+
+    <div class="form-card__badge">
+      <span class="glow-dot"></span>
+      Let's Work Together
+    </div>
+
+    <h1 class="form-card__title">
+      Tell Us About <span class="text-gradient">Your Business</span>
+    </h1>
+    <p class="form-card__sub">
+      Fill in the details below and we'll reach out to discuss your perfect website — no obligations, just possibilities.
+    </p>
+
+    <div class="form-divider"></div>
+
+    <!-- 1. Name -->
+    <div class="field">
+      <label for="f-name">Your Name <span class="req">*</span></label>
+      <input type="text" id="f-name" placeholder="e.g. Rahul Sharma" autocomplete="name" />
+      <div class="field-error" id="err-name">Please enter your full name.</div>
+    </div>
+
+    <!-- 2. Mobile Number -->
+    <div class="field">
+      <label for="f-mobile">Mobile Number <span class="req">*</span></label>
+      <div class="phone-wrap">
+        <div class="phone-prefix">🇮🇳 +91</div>
+        <input type="tel" id="f-mobile" placeholder="98765 43210" maxlength="10" autocomplete="tel" inputmode="numeric" />
+      </div>
+      <div class="field-error" id="err-mobile">Please enter a valid 10-digit mobile number.</div>
+    </div>
+
+    <!-- 3. Business Name -->
+    <div class="field">
+      <label for="f-biz">Business Name <span class="req">*</span></label>
+      <input type="text" id="f-biz" placeholder="e.g. Sharma Electronics" autocomplete="organization" />
+      <div class="field-error" id="err-biz">Please enter your business name.</div>
+    </div>
+
+    <!-- 4. Type of Business -->
+    <div class="field">
+      <label for="f-type">Type of Business <span class="req">*</span></label>
+      <div class="select-wrap">
+        <select id="f-type">
+          <option value="" disabled selected>— Select your business type —</option>
+
+          <optgroup label="🛍️ Retail & Shopping">
+            <option>Retail Store / General Shop</option>
+            <option>Online Store / E-Commerce</option>
+            <option>Grocery Store / Supermarket</option>
+            <option>Pharmacy / Medical Store</option>
+            <option>Clothing & Apparel Store</option>
+            <option>Footwear Store</option>
+            <option>Jewelry Store</option>
+            <option>Electronics Store</option>
+            <option>Hardware / Tools Store</option>
+            <option>Furniture Store</option>
+            <option>Gift & Stationery Shop</option>
+            <option>Mobile / Accessories Shop</option>
+          </optgroup>
+
+          <optgroup label="🍽️ Food & Beverage">
+            <option>Restaurant / Dhaba</option>
+            <option>Café / Coffee Shop</option>
+            <option>Bakery / Sweets & Confectionery</option>
+            <option>Food Delivery Service</option>
+            <option>Catering Service</option>
+            <option>Cloud Kitchen</option>
+            <option>Bar / Pub / Lounge</option>
+            <option>Juice & Snacks Corner</option>
+          </optgroup>
+
+          <optgroup label="🏥 Health & Wellness">
+            <option>Hospital / Clinic</option>
+            <option>Dental Clinic</option>
+            <option>Ayurvedic / Herbal Center</option>
+            <option>Diagnostic / Pathology Lab</option>
+            <option>Gym / Fitness Center</option>
+            <option>Yoga / Meditation Center</option>
+            <option>Spa / Salon / Beauty Parlor</option>
+            <option>Physiotherapy Center</option>
+            <option>Mental Health / Counseling</option>
+            <option>Nutritionist / Dietitian</option>
+          </optgroup>
+
+          <optgroup label="🎓 Education & Training">
+            <option>School / College / University</option>
+            <option>Coaching Institute / Tuition Center</option>
+            <option>Skill Development / Vocational Training</option>
+            <option>E-Learning / Online Courses Platform</option>
+            <option>Playschool / Daycare / Creche</option>
+            <option>Music / Dance / Art Academy</option>
+            <option>Language Learning Center</option>
+            <option>Sports Academy</option>
+          </optgroup>
+
+          <optgroup label="💼 Professional Services">
+            <option>Law Firm / Legal Services</option>
+            <option>Chartered Accountant / Tax Consultant</option>
+            <option>Insurance Agency</option>
+            <option>Real Estate / Property Dealer</option>
+            <option>Travel Agency / Tour Operator</option>
+            <option>Event Management</option>
+            <option>Consulting Firm</option>
+            <option>Recruitment / HR Services</option>
+            <option>Import / Export Business</option>
+            <option>Logistics & Supply Chain</option>
+          </optgroup>
+
+          <optgroup label="💻 Technology & Digital">
+            <option>IT Services / Software Company</option>
+            <option>Digital Marketing Agency</option>
+            <option>Web Design / Development Studio</option>
+            <option>App Development Company</option>
+            <option>Cybersecurity Firm</option>
+            <option>Freelancer / Independent Consultant</option>
+            <option>Startup / New Business</option>
+          </optgroup>
+
+          <optgroup label="🏗️ Construction & Trade">
+            <option>Construction / Contracting Company</option>
+            <option>Interior Design / Architecture</option>
+            <option>Real Estate Developer / Builder</option>
+            <option>Electrical / Plumbing / Civil Services</option>
+            <option>Home Decor & Renovation</option>
+            <option>Manufacturing Unit / Factory</option>
+            <option>Auto Workshop / Garage / Dealership</option>
+            <option>Printing & Packaging</option>
+          </optgroup>
+
+          <optgroup label="💰 Finance & Investment">
+            <option>Bank / Financial Institution</option>
+            <option>Investment / Wealth Management Firm</option>
+            <option>Stock Broker / Trading Platform</option>
+            <option>Mutual Fund Advisor</option>
+            <option>Microfinance / Loan Services</option>
+            <option>Accounting / Bookkeeping Services</option>
+          </optgroup>
+
+          <optgroup label="🎬 Entertainment & Media">
+            <option>Photography / Videography Studio</option>
+            <option>Production House / Film Studio</option>
+            <option>Entertainment Company</option>
+            <option>News / Media / Publishing Agency</option>
+            <option>Gaming / Esports</option>
+            <option>OTT / Streaming Platform</option>
+            <option>Podcast / Content Creator</option>
+          </optgroup>
+
+          <optgroup label="🌾 Agriculture & Environment">
+            <option>Agriculture / Farming Business</option>
+            <option>Organic Products / Agri-Startup</option>
+            <option>Nursery / Landscaping</option>
+            <option>Renewable Energy / Solar Services</option>
+            <option>Environmental Consulting</option>
+          </optgroup>
+
+          <optgroup label="🤝 NGO & Social">
+            <option>Non-Governmental Organization (NGO)</option>
+            <option>Charity / Foundation / Trust</option>
+            <option>Religious Organization / Temple / Church</option>
+            <option>Community / Social Service Group</option>
+            <option>Political Campaign / Public Service</option>
+          </optgroup>
+
+          <optgroup label="✨ Other">
+            <option>Personal Portfolio / Resume</option>
+            <option>Government / Public Sector</option>
+            <option>Transport / Fleet Services</option>
+            <option>Pet Care / Veterinary Services</option>
+            <option>Wedding / Bridal Services</option>
+            <option>Other (will specify on WhatsApp)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field-error" id="err-type">Please select your business type.</div>
+    </div>
+
+    <!-- Submit -->
+    <button class="btn-submit" id="submitBtn" type="button" onclick="handleSubmit()">
+      <span class="btn-icon">💬</span> Send via WhatsApp
+    </button>
+
+    <!-- WhatsApp note -->
+    <div class="whatsapp-note">
+      <svg class="wa-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Your details will open in WhatsApp — one tap to send.
+    </div>
+
+    <!-- Privacy note -->
+    <p class="privacy-note">
+      🔒 Your information is only used to get in touch with you. We never share your details with third parties.
+    </p>
+
+  </div>
+</section>
+
+<script src="main.js"></script>
+<script>
+  function handleSubmit() {
+    const name   = document.getElementById('f-name').value.trim();
+    const mobile = document.getElementById('f-mobile').value.trim().replace(/\s+/g, '');
+    const biz    = document.getElementById('f-biz').value.trim();
+    const type   = document.getElementById('f-type').value;
+
+    let valid = true;
+
+    // Validate Name
+    const errName = document.getElementById('err-name');
+    if (!name) {
+      document.getElementById('f-name').classList.add('error');
+      errName.classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('f-name').classList.remove('error');
+      errName.classList.remove('visible');
+    }
+
+    // Validate Mobile (10 digits)
+    const errMobile = document.getElementById('err-mobile');
+    if (!/^\d{10}$/.test(mobile)) {
+      document.getElementById('f-mobile').classList.add('error');
+      errMobile.classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('f-mobile').classList.remove('error');
+      errMobile.classList.remove('visible');
+    }
+
+    // Validate Business Name
+    const errBiz = document.getElementById('err-biz');
+    if (!biz) {
+      document.getElementById('f-biz').classList.add('error');
+      errBiz.classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('f-biz').classList.remove('error');
+      errBiz.classList.remove('visible');
+    }
+
+    // Validate Business Type
+    const errType = document.getElementById('err-type');
+    if (!type) {
+      document.getElementById('f-type').classList.add('error');
+      errType.classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('f-type').classList.remove('error');
+      errType.classList.remove('visible');
+    }
+
+    if (!valid) return;
+
+    // Build WhatsApp message
+    const message =
+      `🌟 *New Client Enquiry — Comet Webs*\n\n` +
+      `👤 *Name:* ${name}\n` +
+      `📱 *Mobile:* +91 ${mobile}\n` +
+      `🏢 *Business Name:* ${biz}\n` +
+      `💼 *Business Type:* ${type}\n\n` +
+      `I am interested in getting a website made. Please get in touch!`;
+
+    const encoded = encodeURIComponent(message);
+    const waURL   = `https://wa.me/919687608826?text=${encoded}`;
+
+    // Open WhatsApp in new tab
+    window.open(waURL, '_blank');
+
+    // Redirect current page to thank-you after short delay
+    setTimeout(() => {
+      window.location.href = 'thankyou.html';
+    }, 600);
+  }
+
+  // Allow only digits in mobile field
+  document.getElementById('f-mobile').addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '');
+  });
+</script>
+</body>
+</html>

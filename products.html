@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products — Comet Webs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Products-page specific ── */
+
+    /* Animated hero headline */
+    .product-hero-headline {
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+    }
+
+    /* Comma separator decoration */
+    .headline-comma {
+      background: var(--grad-comet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Product hero decorative ring */
+    .product-hero-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      pointer-events: none;
+      animation: spin-slow linear infinite;
+    }
+
+    /* Comparison note */
+    .compare-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--star-faint);
+      margin-top: 1rem;
+    }
+
+    /* Feature list inside product card */
+    .product-feature-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .product-feature-row:last-child { border-bottom: none; }
+    .product-feature-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(124,58,237,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      margin-top: 0.1rem;
+    }
+    .product-feature-text {
+      font-size: 0.9rem;
+      color: var(--star-dim);
+      line-height: 1.4;
+    }
+    .product-feature-text strong {
+      color: var(--star-white);
+      font-weight: 600;
+    }
+
+    /* Coming soon badge */
+    .coming-soon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--star-faint);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+    }
+
+    /* FAQ section */
+    .faq-item {
+      border: var(--border-dim);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+      background: rgba(13,7,38,0.5);
+      transition: border-color var(--t-med);
+    }
+    .faq-item:hover { border-color: rgba(124,58,237,0.4); }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 1.5rem;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--star-white);
+      gap: 1rem;
+    }
+    .faq-question-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(124,58,237,0.15);
+      border: var(--border-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: transform var(--t-med) var(--ease-bounce), background var(--t-med);
+      color: var(--comet-cyan);
+    }
+    .faq-item.open .faq-question-icon {
+      transform: rotate(45deg);
+      background: rgba(124,58,237,0.3);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease-smooth), padding 0.3s;
+      padding: 0 1.5rem;
+      color: var(--star-dim);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding: 0 1.5rem 1.2rem;
+    }
+
+    /* Process steps */
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0;
+      position: relative;
+    }
+    .process-step {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .process-step::after {
+      content: '→';
+      position: absolute;
+      right: -0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--star-faint);
+      font-size: 1.2rem;
+    }
+    .process-step:last-child::after { display: none; }
+    .process-step__num {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--comet-cyan);
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+    .process-step__icon {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+    }
+    .process-step__title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--star-white);
+      margin-bottom: 0.4rem;
+    }
+    .process-step__desc {
+      color: var(--star-faint);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .process-step::after { display: none; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .process-steps { grid-template-columns: 1fr; }
+      .product-hero-headline { font-size: 2.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starfield-canvas"></canvas>
+
+<!-- ── Navigation ── -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img src="logo.jpeg" alt="Comet Webs" />
+      <span class="nav__logo-text">COMET WEBS</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="products.html" class="active">Products</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a href="client.html" target="_blank" class="nav__cta">Get Started</a>
+    <button class="nav__hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="nav__mobile">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <a href="client.html" target="_blank" class="nav__cta">Get Started ↗</a>
+</div>
+
+<!-- ── Hero ── -->
+<section class="img-hero" style="min-height:80vh;">
+  <!-- Deep space bg -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%, rgba(124,58,237,0.2) 0%, transparent 55%), radial-gradient(ellipse at 20% 70%, rgba(59,130,246,0.15) 0%, transparent 50%), var(--grad-dark);z-index:0;"></div>
+  
+  <!-- Decorative rings -->
+  <div class="product-hero-ring" style="width:400px;height:400px;border-color:rgba(124,58,237,0.12);top:10%;right:-100px;animation-duration:40s;"></div>
+  <div class="product-hero-ring" style="width:250px;height:250px;border-color:rgba(6,182,212,0.1);top:30%;right:-30px;animation-duration:28s;animation-direction:reverse;"></div>
+  <div class="product-hero-ring" style="width:180px;height:180px;border-color:rgba(124,58,237,0.18);bottom:15%;left:5%;animation-duration:20s;"></div>
+
+  <div class="img-hero__overlay"></div>
+  <div class="img-hero__content">
+    <div class="eyebrow eyebrow-center anim-fade-up">Our Offerings</div>
+    <h1 class="product-hero-headline anim-fade-up delay-1">
+      Let's Create<span class="headline-comma">,</span><br>
+      Let's <span class="text-gradient">Grow.</span>
+    </h1>
+    <p class="text-dim anim-fade-up delay-2" style="max-width:580px;margin:1.4rem auto 2.2rem;font-size:1.1rem;line-height:1.7;">
+      Two powerful ways to get the website your business deserves — crafted to convert, built to last, designed to impress.
+    </p>
+    <div class="anim-fade-up delay-3" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="#personalized" class="btn btn--primary btn--lg">✦ Explore Products</a>
+      <a href="client.html" target="_blank" class="btn btn--secondary btn--lg">💬 Talk to Us</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── How It Works ── -->
+<section class="section-pad">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem;" class="reveal">
+      <div class="eyebrow eyebrow-center">The Process</div>
+      <h2 class="h-section">From <span class="text-gradient">Idea</span> to Launch</h2>
+    </div>
+    <div class="process-steps reveal">
+      <div class="process-step">
+        <div class="process-step__num">01</div>
+        <div class="process-step__icon">💬</div>
+        <div class="process-step__title">Consultation</div>
+        <div class="process-step__desc">We understand your goals, audience and business needs.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-step__num">02</div>
+        <div class="process-step__icon">🎨</div>
+        <div class="process-step__title">Design</div>
+        <div class="process-step__desc">We craft a stunning, brand-aligned visual design for you.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-step__num">03</div>
+        <div class="process-step__icon">⚡</div>
+        <div class="process-step__title">Develop</div>
+        <div class="process-step__desc">We build it fast, clean and fully responsive across devices.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-step__num">04</div>
+        <div class="process-step__icon">🚀</div>
+        <div class="process-step__title">Launch</div>
+        <div class="process-step__desc">Your website goes live — optimized and ready to grow.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Product 1: Personalized Webs ── -->
+<section class="section-pad section-pad--lg" id="personalized">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:4rem;" class="reveal">
+      <div class="eyebrow eyebrow-center">Product 01</div>
+      <h2 class="h-section"><span class="text-gradient">Personalized</span> Webs</h2>
+      <p class="text-dim" style="max-width:480px;margin:0.8rem auto 0;">A website built from scratch, around your brand, your goals, your voice.</p>
+    </div>
+
+    <div class="product-card reveal">
+      <!-- Image Side -->
+      <div class="product-card__img-side">
+        <!-- Visual mockup of a premium custom website -->
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0d0726 0%,#1a1450 40%,#130f3a 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <!-- Decorative laptop mockup -->
+          <div style="position:relative;width:85%;max-width:340px;">
+            <!-- Glow behind screen -->
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:180px;background:radial-gradient(ellipse,rgba(124,58,237,0.4),transparent 70%);pointer-events:none;"></div>
+            <!-- Screen -->
+            <div style="background:#0a0718;border-radius:12px;border:2px solid rgba(124,58,237,0.4);padding:1rem;box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(124,58,237,0.2);position:relative;">
+              <!-- Browser bar -->
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.8rem;padding-bottom:0.6rem;border-bottom:1px solid rgba(255,255,255,0.08);">
+                <div style="width:7px;height:7px;border-radius:50%;background:#ff5f57;"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#febc2e;"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#28c840;"></div>
+                <div style="flex:1;height:14px;border-radius:3px;background:rgba(255,255,255,0.06);margin-left:0.5rem;"></div>
+              </div>
+              <!-- Hero mockup area -->
+              <div style="height:70px;border-radius:6px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(59,130,246,0.2));margin-bottom:0.6rem;display:flex;align-items:center;justify-content:center;">
+                <div style="width:50%;height:8px;border-radius:4px;background:rgba(255,255,255,0.4);"></div>
+              </div>
+              <!-- Content blocks -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;margin-bottom:0.6rem;">
+                <div style="height:32px;border-radius:4px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.2);"></div>
+                <div style="height:32px;border-radius:4px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);"></div>
+                <div style="height:32px;border-radius:4px;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);"></div>
+              </div>
+              <!-- Text lines -->
+              <div style="display:flex;flex-direction:column;gap:0.3rem;">
+                <div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.12);width:90%;"></div>
+                <div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.08);width:70%;"></div>
+                <div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.06);width:80%;"></div>
+              </div>
+            </div>
+            <!-- Stand -->
+            <div style="width:50%;height:6px;background:rgba(124,58,237,0.3);margin:0 auto;border-radius:0 0 4px 4px;"></div>
+            <div style="width:70%;height:3px;background:rgba(124,58,237,0.2);margin:0 auto;border-radius:2px;"></div>
+            <!-- Floating stars -->
+            <div style="position:absolute;top:-20px;right:-10px;width:6px;height:6px;border-radius:50%;background:var(--comet-cyan);box-shadow:0 0 10px var(--comet-cyan);animation:float-up 3s ease-in-out infinite;"></div>
+            <div style="position:absolute;bottom:20px;left:-15px;width:4px;height:4px;border-radius:50%;background:var(--nebula-violet);box-shadow:0 0 8px var(--nebula-violet);animation:float-up 4s ease-in-out infinite 1s;"></div>
+          </div>
+        </div>
+        <div class="product-card__img-overlay"></div>
+      </div>
+
+      <!-- Content Side -->
+      <div class="product-card__content">
+        <div class="product-card__tag">✦ Premium Product</div>
+        <h3 class="product-card__title">
+          Personalized<br><span class="text-gradient">Webs</span>
+        </h3>
+        <p class="product-card__desc">
+          Your brand is unique — your website should be too. We design and develop a fully custom website from scratch, built around your specific goals, audience, and identity. Every pixel is yours.
+        </p>
+
+        <ul class="product-card__features" style="margin-top:0.5rem;">
+          <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>100% Custom Design</strong> — Tailored to your brand identity, not a template</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>Mobile-First & Responsive</strong> — Flawless on phones, tablets, desktops</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>SEO Optimized</strong> — Built to rank on Google from day one</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>Fast Loading</strong> — Blazing performance for better conversions</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>Dedicated Support</strong> — We're with you post-launch, always</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>Custom Features</strong> — Forms, galleries, bookings — you name it</div>
+          </li>
+         <li class="product-feature-row">
+            <div class="product-feature-icon">✦</div>
+            <div class="product-feature-text"><strong>Low Cost</strong> — Starting at just 2000 INR</div>
+          </li>
+        </ul>
+
+        <div class="product-card__actions" style="margin-top:1.2rem;">
+          <a href="client.html" target="_blank" class="btn btn--whatsapp">
+            🛒 Buy Now 
+          </a>
+          <a href="explore.html" class="btn btn--ghost">
+            ↗ Explore Such Sites
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Product 2: Ready Made Webs ── -->
+<section class="section-pad section-pad--lg" id="readymade">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:4rem;" class="reveal">
+      <div class="eyebrow eyebrow-center">Product 02</div>
+      <h2 class="h-section"><span class="text-gradient-nebula">Ready Made</span> Webs</h2>
+      <p class="text-dim" style="max-width:500px;margin:0.8rem auto 0;">Pre-built, professionally designed websites — get online fast without the wait.</p>
+    </div>
+
+    <div class="product-card reveal" style="direction:rtl;">
+      <!-- Image Side (visually right side) -->
+      <div class="product-card__img-side" style="direction:ltr;">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#130f3a 0%,#0d1f40 40%,#07031a 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <!-- Ready-made grid mockup -->
+          <div style="position:relative;width:85%;max-width:320px;">
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:180px;background:radial-gradient(ellipse,rgba(59,130,246,0.35),transparent 70%);pointer-events:none;"></div>
+            <!-- Cards grid showing templates -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;position:relative;">
+              <div style="border-radius:8px;overflow:hidden;border:1px solid rgba(59,130,246,0.35);box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+                <div style="height:50px;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(6,182,212,0.2));"></div>
+                <div style="background:#0a1628;padding:0.4rem 0.5rem;">
+                  <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin-bottom:0.3rem;width:80%;"></div>
+                  <div style="height:3px;border-radius:2px;background:rgba(255,255,255,0.1);width:60%;"></div>
+                </div>
+              </div>
+              <div style="border-radius:8px;overflow:hidden;border:1px solid rgba(168,85,247,0.35);box-shadow:0 8px 24px rgba(0,0,0,0.5);margin-top:1rem;">
+                <div style="height:50px;background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(124,58,237,0.2));"></div>
+                <div style="background:#0d0726;padding:0.4rem 0.5rem;">
+                  <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin-bottom:0.3rem;width:75%;"></div>
+                  <div style="height:3px;border-radius:2px;background:rgba(255,255,255,0.1);width:55%;"></div>
+                </div>
+              </div>
+              <div style="border-radius:8px;overflow:hidden;border:1px solid rgba(6,182,212,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.5);margin-top:-0.5rem;">
+                <div style="height:50px;background:linear-gradient(135deg,rgba(6,182,212,0.25),rgba(59,130,246,0.15));"></div>
+                <div style="background:#071520;padding:0.4rem 0.5rem;">
+                  <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin-bottom:0.3rem;width:85%;"></div>
+                  <div style="height:3px;border-radius:2px;background:rgba(255,255,255,0.08);width:65%;"></div>
+                </div>
+              </div>
+              <div style="border-radius:8px;overflow:hidden;border:1px solid rgba(245,158,11,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+                <div style="height:50px;background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(234,88,12,0.15));"></div>
+                <div style="background:#120800;padding:0.4rem 0.5rem;">
+                  <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin-bottom:0.3rem;width:70%;"></div>
+                  <div style="height:3px;border-radius:2px;background:rgba(255,255,255,0.08);width:50%;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Floating badge -->
+            <div style="position:absolute;top:-15px;right:-20px;background:linear-gradient(135deg,var(--nebula-purple),var(--comet-blue));border-radius:8px;padding:0.35rem 0.75rem;font-family:'Space Mono',monospace;font-size:0.6rem;color:white;letter-spacing:0.1em;box-shadow:0 0 20px rgba(124,58,237,0.5);">COMING SOON</div>
+          </div>
+        </div>
+        <div class="product-card__img-overlay" style="direction:ltr;background:linear-gradient(270deg,transparent 60%,rgba(13,7,38,0.7) 100%);"></div>
+      </div>
+
+      <!-- Content Side -->
+      <div class="product-card__content" style="direction:ltr;">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <div class="product-card__tag" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.25);color:var(--comet-blue);">◉ Ready Made</div>
+          <div class="coming-soon-badge">🕐 Coming Soon</div>
+        </div>
+        <h3 class="product-card__title">
+          Ready Made<br><span class="text-gradient-nebula">Webs</span>
+        </h3>
+        <p class="product-card__desc">
+          Want a beautiful website right now? Choose from our growing library of professionally designed, industry-specific website templates. Pick, customize with your content, and go live fast.
+        </p>
+
+        <ul class="product-card__features" style="margin-top:0.5rem;">
+          <li class="product-feature-row">
+            <div class="product-feature-icon" style="background:rgba(59,130,246,0.2);">✦</div>
+            <div class="product-feature-text"><strong>Multiple Industries</strong> — Templates for restaurants, academies, shops & more</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon" style="background:rgba(59,130,246,0.2);">✦</div>
+            <div class="product-feature-text"><strong>Quick Delivery</strong> — Get online in a fraction of the time</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon" style="background:rgba(59,130,246,0.2);">✦</div>
+            <div class="product-feature-text"><strong>Content Swap</strong> — We plug in your text, images, and branding</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon" style="background:rgba(59,130,246,0.2);">✦</div>
+            <div class="product-feature-text"><strong>Budget Friendly</strong> — Premium quality at accessible pricing</div>
+          </li>
+          <li class="product-feature-row">
+            <div class="product-feature-icon" style="background:rgba(59,130,246,0.2);">✦</div>
+            <div class="product-feature-text"><strong>Mobile Ready</strong> — Every template is fully responsive by default</div>
+          </li>
+        </ul>
+
+        <div class="product-card__actions" style="margin-top:1.2rem;">
+          <!-- Coming soon — no action on click -->
+          <button class="btn btn--disabled" onclick="return false;" style="cursor:not-allowed;opacity:0.65;">
+            🕐 Coming Soon
+          </button>
+        
+        </div>
+        <p style="font-size:0.78rem;color:var(--star-faint);margin-top:0.8rem;">Ready Made Webs will be available very soon. <a href="https://wa.me/919687608826?text=Notify%20me%20when%20Ready%20Made%20Webs%20launch!" target="_blank" style="color:var(--comet-cyan);text-decoration:none;">Get notified →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FAQ ── -->
+<section class="section-pad">
+  <div class="container" style="max-width:780px;">
+    <div style="text-align:center;margin-bottom:3rem;" class="reveal">
+      <div class="eyebrow eyebrow-center">Got Questions?</div>
+      <h2 class="h-section">Frequently <span class="text-gradient">Asked</span></h2>
+    </div>
+
+    <div class="reveal">
+      <div class="faq-item">
+        <div class="faq-question">
+          How long does it take to build a Personalized Web?
+          <span class="faq-question-icon">+</span>
+        </div>
+        <div class="faq-answer">Most personalized websites are delivered within 3–7 business days depending on the complexity, number of pages, and your feedback speed. We keep you in the loop throughout the process.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          Do I need to provide content and images?
+          <span class="faq-question-icon">+</span>
+        </div>
+        <div class="faq-answer">Ideally yes — your own content and photos work best. But if you don't have them, we can help source royalty-free images and write placeholder content to get things moving.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          Will my website work on mobile phones?
+          <span class="faq-question-icon">+</span>
+        </div>
+        <div class="faq-answer">Absolutely. Every website we build is mobile-first and tested across phones, tablets, and desktops before delivery. Your customers get a great experience regardless of device.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          What's included after the website launches?
+          <span class="faq-question-icon">+</span>
+        </div>
+        <div class="faq-answer">We provide post-launch support to fix any bugs or small tweaks. For ongoing updates, changes, or hosting management, we offer flexible support packages to keep your site running smoothly.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          How do I pay and get started?
+          <span class="faq-question-icon">+</span>
+        </div>
+        <div class="faq-answer">Simple — just<a href="client.html"> Click here!</a> We'll discuss your needs, share a quote, and once you confirm, we begin immediately. Payment is processed securely and conveniently.</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="text-align:center;margin-top:3rem;">
+      <p class="text-dim" style="margin-bottom:1.5rem;">Still have questions? We're one message away.</p>
+      <a href="https://wa.me/919687608826?text=I%20have%20a%20question%20about%20your%20products!" target="_blank" class="btn btn--whatsapp btn--lg">
+        💬 Ask on WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <img src="logo.jpeg" alt="Comet Webs" />
+        <p>We build fast, beautiful, high-converting websites that rocket your business to the top. From concept to launch — we do it all.</p>
+      </div>
+      <div class="footer__col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="explore.html">Explore</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Products</h4>
+        <ul>
+          <li><a href="#personalized">Personalized Webs</a></li>
+          <li><a href="#readymade">Ready Made Webs</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="https://wa.me/919687608826" target="_blank">WhatsApp Us</a></li>
+          <li><a href="tel:+919687608826">+91 96876 08826</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 Comet Webs. All rights reserved.</span>
+      <span style="display:flex;align-items:center;gap:0.5rem;"><span class="glow-dot"></span> Crafted with cosmic precision.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      // close all
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      // open clicked if it was closed
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+</body>
+</html>
