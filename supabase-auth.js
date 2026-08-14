@@ -1,13 +1,10 @@
-/* ============================================================
-   COMET WEBS — Supabase Authentication System
-   Handles login, signup, logout, and protected routes
-   ============================================================ */
+
 
 'use strict';
 
-// Initialize Supabase client using the global supabase object from CDN
-const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Replace with your Supabase project URL
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Supabase anon key
+// Initialize Supabase client
+const SUPABASE_URL = 'https://denubrgfbbnwqjizfzcu.supabase.co'; // Replace with your Supabase project URL
+const SUPABASE_ANON_KEY = 'sb_publishable_SPPfXqFFydR4CBjJy-Grmw_Auhg3DRx'; // Replace with your Supabase anon key
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
