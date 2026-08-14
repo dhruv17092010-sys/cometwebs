@@ -1,7 +1,4 @@
-/* ============================================================
-   COMET WEBS — Supabase Authentication System
-   Handles login, signup, logout, and protected routes
-   ============================================================ */
+
 
 'use strict';
 
