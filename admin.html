@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Comet Webs</title>
+  <meta name="description" content="Admin panel for managing client requests" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .admin-container {
+      min-height: 100vh;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .admin-header {
+      max-width: 1200px;
+      margin: 0 auto 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .admin-header__title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--star-white);
+    }
+
+    .admin-header__actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .admin-user {
+      color: var(--star-dim);
+      font-size: 0.9rem;
+    }
+
+    .admin-logout {
+      color: #fca5a5;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--t-med);
+    }
+
+    .admin-logout:hover {
+      color: #ef4444;
+    }
+
+    .admin-card {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(7, 3, 26, 0.95);
+      border: var(--border-bright);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: 0 0 40px rgba(124, 58, 237, 0.15);
+    }
+
+    .requests-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .requests-table th,
+    .requests-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+    }
+
+    .requests-table th {
+      color: var(--comet-cyan);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .requests-table td {
+      color: var(--star-dim);
+      font-size: 0.9rem;
+    }
+
+    .requests-table tr:hover td {
+      background: rgba(19, 15, 58, 0.4);
+      color: var(--star-white);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-badge--pending {
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      color: #fde047;
+    }
+
+    .status-badge--in-progress {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+
+    .status-badge--completed {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .status-badge--contacted {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #d8b4fe;
+    }
+
+    .action-btn {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--t-med);
+      margin-right: 0.3rem;
+    }
+
+    .action-btn--primary {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+
+    .action-btn--primary:hover {
+      background: rgba(59, 130, 246, 0.3);
+    }
+
+    .action-btn--secondary {
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #d8b4fe;
+    }
+
+    .action-btn--secondary:hover {
+      background: rgba(168, 85, 247, 0.3);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--star-dim);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(124, 58, 237, 0.3);
+      border-top-color: var(--nebula-purple);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .no-requests {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--star-dim);
+    }
+
+    .no-requests__icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: rgba(7, 3, 26, 0.98);
+      border: var(--border-bright);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal__title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--star-white);
+    }
+
+    .modal__close {
+      background: none;
+      border: none;
+      color: var(--star-dim);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color var(--t-med);
+    }
+
+    .modal__close:hover {
+      color: var(--star-white);
+    }
+
+    .modal__content {
+      color: var(--star-dim);
+      line-height: 1.8;
+    }
+
+    .modal__content strong {
+      color: var(--star-white);
+    }
+
+    .modal__actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .refresh-btn {
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      color: var(--comet-cyan);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--t-med);
+    }
+
+    .refresh-btn:hover {
+      background: rgba(124, 58, 237, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .requests-table {
+        font-size: 0.8rem;
+      }
+      
+      .requests-table th,
+      .requests-table td {
+        padding: 0.5rem;
+      }
+      
+      .action-btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield -->
+  <canvas id="starfield-canvas"></canvas>
+
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1 class="admin-header__title">🔐 Admin Dashboard</h1>
+      <div class="admin-header__actions">
+        <span id="adminEmail" class="admin-user"></span>
+        <a href="#" id="logoutBtn" class="admin-logout">Sign Out</a>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-family: var(--font-display); font-size: 1.3rem; color: var(--star-white);">Client Requests</h2>
+        <button id="refreshBtn" class="refresh-btn">↻ Refresh</button>
+      </div>
+
+      <div id="loadingState" class="loading">
+        <div class="spinner"></div>
+        <p>Loading requests...</p>
+      </div>
+
+      <div id="noRequests" class="no-requests" style="display: none;">
+        <div class="no-requests__icon">📭</div>
+        <p>No client requests yet.</p>
+      </div>
+
+      <div id="requestsContainer" style="display: none;">
+        <table class="requests-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Email</th>
+              <th>Business Name</th>
+              <th>Type</th>
+              <th>Mobile</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="requestsBody">
+            <!-- Requests will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Request Modal -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Request Details</h3>
+        <button id="modalClose" class="modal__close">&times;</button>
+      </div>
+      <div id="modalContent" class="modal__content">
+        <!-- Content will be inserted here -->
+      </div>
+      <div class="modal__actions">
+        <button class="action-btn action-btn--primary" data-status="in-progress">Mark as In Progress</button>
+        <button class="action-btn action-btn--secondary" data-status="contacted">Mark as Contacted</button>
+        <button class="action-btn action-btn--primary" data-status="completed">Mark as Completed</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-auth.js"></script>
+  <script src="main.js"></script>
+  <script>
+    'use strict';
+
+    const loadingState = document.getElementById('loadingState');
+    const noRequests = document.getElementById('noRequests');
+    const requestsContainer = document.getElementById('requestsContainer');
+    const requestsBody = document.getElementById('requestsBody');
+    const adminEmail = document.getElementById('adminEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+    const modalContent = document.getElementById('modalContent');
+    const modalActions = document.querySelectorAll('.modal__actions .action-btn');
+
+    let currentRequestId = null;
+
+    // Check admin authentication on load
+    async function init() {
+      const isAdmin = await window.CometAuth.requireAdmin('/index.html');
+      
+      if (!isAdmin) {
+        return;
+      }
+
+      // Show admin email
+      const user = window.CometAuth.getCurrentUser();
+      adminEmail.textContent = user.email;
+
+      // Load requests
+      await loadRequests();
+    }
+
+    // Load all client requests
+    async function loadRequests() {
+      loadingState.style.display = 'block';
+      noRequests.style.display = 'none';
+      requestsContainer.style.display = 'none';
+
+      const result = await window.CometAuth.getAllClientRequests();
+
+      loadingState.style.display = 'none';
+
+      if (!result.success || !result.data || result.data.length === 0) {
+        noRequests.style.display = 'block';
+        return;
+      }
+
+      requestsContainer.style.display = 'block';
+      requestsBody.innerHTML = '';
+
+      result.data.forEach(request => {
+        const row = document.createElement('tr');
+        const date = new Date(request.created_at).toLocaleDateString();
+        const statusClass = `status-badge--${request.status}`;
+        const statusText = request.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${request.email}</td>
+          <td>${request.business_name}</td>
+          <td>${request.business_type}</td>
+          <td>${request.mobile_number}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>
+            <button class="action-btn action-btn--primary" onclick="viewRequest('${request.id}')">View</button>
+          </td>
+        `;
+        requestsBody.appendChild(row);
+      });
+    }
+
+    // View request details
+    window.viewRequest = async (requestId) => {
+      const result = await window.CometAuth.getAllClientRequests();
+      const request = result.data.find(r => r.id === requestId);
+      
+      if (!request) return;
+
+      currentRequestId = requestId;
+      
+      modalContent.innerHTML = `
+        <p><strong>ID:</strong> ${request.id}</p>
+        <p><strong>Date:</strong> ${new Date(request.created_at).toLocaleString()}</p>
+        <p><strong>Email:</strong> ${request.email}</p>
+        <p><strong>Business Name:</strong> ${request.business_name}</p>
+        <p><strong>Business Type:</strong> ${request.business_type}</p>
+        <p><strong>Mobile Number:</strong> ${request.mobile_number}</p>
+        <p><strong>Status:</strong> ${request.status}</p>
+      `;
+
+      modalOverlay.classList.add('active');
+    };
+
+    // Close modal
+    modalClose.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+      currentRequestId = null;
+    });
+
+    // Close modal on overlay click
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+        currentRequestId = null;
+      }
+    });
+
+    // Update request status
+    modalActions.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const newStatus = btn.dataset.status;
+        
+        if (!currentRequestId) return;
+
+        const { error } = await window.CometAuth.supabase
+          .from('client_requests')
+          .update({ status: newStatus })
+          .eq('id', currentRequestId);
+
+        if (error) {
+          alert('Failed to update status: ' + error.message);
+          return;
+        }
+
+        modalOverlay.classList.remove('active');
+        await loadRequests();
+      });
+    });
+
+    // Handle logout
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const result = await window.CometAuth.signOut();
+      if (result.success) {
+        window.location.href = '/index.html';
+      }
+    });
+
+    // Refresh requests
+    refreshBtn.addEventListener('click', loadRequests);
+
+    // Initialize
+    init();
+  </script>
+</body>
+</html>

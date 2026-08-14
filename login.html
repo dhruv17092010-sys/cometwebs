@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Comet Webs</title>
+  <meta name="description" content="Login to your Comet Webs account" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-card {
+      background: rgba(7, 3, 26, 0.95);
+      border: var(--border-bright);
+      border-radius: var(--radius-xl);
+      padding: 3rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 40px rgba(124, 58, 237, 0.15);
+    }
+
+    .auth-card__header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-card__logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .auth-card__title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--star-white);
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-card__subtitle {
+      color: var(--star-dim);
+      font-size: 0.9rem;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      color: var(--star-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      padding: 0.85rem 1rem;
+      background: rgba(19, 15, 58, 0.6);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: var(--radius-sm);
+      color: var(--star-white);
+      font-size: 0.95rem;
+      transition: all var(--t-med);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--nebula-purple);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+    }
+
+    .form-group input::placeholder {
+      color: var(--star-faint);
+    }
+
+    .auth-form__submit {
+      margin-top: 0.5rem;
+    }
+
+    .auth-form__message {
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      text-align: center;
+      display: none;
+    }
+
+    .auth-form__message--error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .auth-form__message--success {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      color: var(--star-faint);
+      font-size: 0.85rem;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.3), transparent);
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--star-dim);
+      font-size: 0.9rem;
+    }
+
+    .auth-switch a {
+      color: var(--comet-cyan);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--t-med);
+    }
+
+    .auth-switch a:hover {
+      color: var(--nebula-purple);
+      text-decoration: underline;
+    }
+
+    .auth-toggle {
+      display: none;
+    }
+
+    .auth-toggle.active {
+      display: block;
+    }
+
+    .auth-toggle.inactive {
+      display: none;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--star-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      transition: color var(--t-med);
+    }
+
+    .back-link:hover {
+      color: var(--comet-cyan);
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield -->
+  <canvas id="starfield-canvas"></canvas>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <a href="index.html" class="back-link">
+        ← Back to Home
+      </a>
+
+      <div class="auth-card__header">
+        <img src="logo.jpeg" alt="Comet Webs Logo" class="auth-card__logo" />
+        <h1 class="auth-card__title">Welcome Back</h1>
+        <p class="auth-card__subtitle">Sign in to your Comet Webs account</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form auth-toggle active">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input 
+            type="email" 
+            id="loginEmail" 
+            placeholder="your@email.com" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input 
+            type="password" 
+            id="loginPassword" 
+            placeholder="••••••••" 
+            required 
+            autocomplete="current-password"
+          />
+        </div>
+
+        <div id="loginMessage" class="auth-form__message"></div>
+
+        <button type="submit" class="btn btn--primary auth-form__submit">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="auth-form auth-toggle inactive">
+        <div class="form-group">
+          <label for="signupEmail">Email Address</label>
+          <input 
+            type="email" 
+            id="signupEmail" 
+            placeholder="your@email.com" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input 
+            type="password" 
+            id="signupPassword" 
+            placeholder="At least 8 characters" 
+            required 
+            minlength="8"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            placeholder="Confirm your password" 
+            required 
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div id="signupMessage" class="auth-form__message"></div>
+
+        <button type="submit" class="btn btn--primary auth-form__submit">
+          Create Account
+        </button>
+      </form>
+
+      <div class="auth-divider">OR</div>
+
+      <div class="auth-switch">
+        <span id="switchText">Don't have an account?</span>
+        <a href="#" id="switchAuth">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-auth.js"></script>
+  <script src="main.js"></script>
+  <script>
+    'use strict';
+
+    // Check if already logged in
+    (async () => {
+      await window.CometAuth.checkAuth();
+      if (window.CometAuth.getCurrentUser()) {
+        window.location.href = '/client.html';
+      }
+    })();
+
+    // Toggle between login and signup
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const switchAuth = document.getElementById('switchAuth');
+    const switchText = document.getElementById('switchText');
+    let isLoginMode = true;
+
+    switchAuth.addEventListener('click', (e) => {
+      e.preventDefault();
+      isLoginMode = !isLoginMode;
+      
+      if (isLoginMode) {
+        loginForm.classList.add('active');
+        loginForm.classList.remove('inactive');
+        signupForm.classList.add('inactive');
+        signupForm.classList.remove('active');
+        switchText.textContent = "Don't have an account?";
+        switchAuth.textContent = 'Sign Up';
+      } else {
+        loginForm.classList.add('inactive');
+        loginForm.classList.remove('active');
+        signupForm.classList.add('active');
+        signupForm.classList.remove('inactive');
+        switchText.textContent = 'Already have an account?';
+        switchAuth.textContent = 'Sign In';
+      }
+
+      // Clear messages
+      document.getElementById('loginMessage').style.display = 'none';
+      document.getElementById('signupMessage').style.display = 'none';
+    });
+
+    // Handle login
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const messageEl = document.getElementById('loginMessage');
+
+      messageEl.style.display = 'none';
+      messageEl.className = 'auth-form__message';
+
+      const result = await window.CometAuth.signIn(email, password);
+
+      if (result.success) {
+        messageEl.textContent = 'Login successful! Redirecting...';
+        messageEl.classList.add('auth-form__message--success');
+        messageEl.style.display = 'block';
+        
+        setTimeout(() => {
+          window.location.href = '/client.html';
+        }, 1000);
+      } else {
+        messageEl.textContent = result.error || 'Login failed. Please try again.';
+        messageEl.classList.add('auth-form__message--error');
+        messageEl.style.display = 'block';
+      }
+    });
+
+    // Handle signup
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const messageEl = document.getElementById('signupMessage');
+
+      messageEl.style.display = 'none';
+      messageEl.className = 'auth-form__message';
+
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        messageEl.textContent = 'Passwords do not match. Please try again.';
+        messageEl.classList.add('auth-form__message--error');
+        messageEl.style.display = 'block';
+        return;
+      }
+
+      // Validate password length
+      if (password.length < 8) {
+        messageEl.textContent = 'Password must be at least 8 characters long.';
+        messageEl.classList.add('auth-form__message--error');
+        messageEl.style.display = 'block';
+        return;
+      }
+
+      const result = await window.CometAuth.signUp(email, password);
+
+      if (result.success) {
+        messageEl.textContent = 'Account created! Please check your email to verify your account, then sign in.';
+        messageEl.classList.add('auth-form__message--success');
+        messageEl.style.display = 'block';
+        
+        // Auto-switch to login after success
+        setTimeout(() => {
+          switchAuth.click();
+        }, 3000);
+      } else {
+        messageEl.textContent = result.error || 'Signup failed. Please try again.';
+        messageEl.classList.add('auth-form__message--error');
+        messageEl.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
