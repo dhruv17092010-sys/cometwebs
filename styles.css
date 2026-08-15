@@ -268,7 +268,7 @@ body {
 
 /* Mobile Menu */
 .nav__mobile {
-  display: none;
+  display: block;
   position: fixed;
   top: var(--nav-h);
   left: 0; right: 0;
@@ -280,15 +280,21 @@ body {
   border-bottom: var(--border-bright);
   transform: translateY(-20px);
   opacity: 0;
+  visibility: hidden;
   transition: transform var(--t-med) var(--ease-smooth),
-              opacity var(--t-med) var(--ease-smooth);
+              opacity var(--t-med) var(--ease-smooth),
+              visibility 0s linear var(--t-med);
   pointer-events: none;
 }
 
 .nav__mobile.open {
   transform: translateY(0);
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transition: transform var(--t-med) var(--ease-smooth),
+              opacity var(--t-med) var(--ease-smooth),
+              visibility 0s linear 0s;
 }
 
 .nav__mobile ul {
