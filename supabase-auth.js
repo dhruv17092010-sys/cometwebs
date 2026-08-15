@@ -1,7 +1,4 @@
-/* ============================================================
-   COMET WEBS — Supabase Authentication System
-   Handles login, signup, logout, and protected routes
-   ============================================================ */
+
 
 'use strict';
 
@@ -9,7 +6,7 @@
 const SUPABASE_URL = 'https://denubrgfbbnwqjizfzcu.supabase.co'; // Replace with your Supabase project URL
 const SUPABASE_ANON_KEY = 'sb_publishable_SPPfXqFFydR4CBjJy-Grmw_Auhg3DRx'; // Replace with your Supabase anon key
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Auth state management
 let currentUser = null;
@@ -17,7 +14,7 @@ let currentSession = null;
 
 // Check if user is logged in on page load
 async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await _supabase.auth.getSession();
   currentSession = session;
   currentUser = session?.user || null;
   return currentUser;
@@ -26,7 +23,7 @@ async function checkAuth() {
 // Sign up function
 async function signUp(email, password) {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await _supabase.auth.signUp({
       email,
       password,
     });
@@ -41,7 +38,7 @@ async function signUp(email, password) {
 // Sign in function
 async function signIn(email, password) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await _supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -58,7 +55,7 @@ async function signIn(email, password) {
 // Sign out function
 async function signOut() {
   try {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await _supabase.auth.signOut();
     if (error) throw error;
     currentUser = null;
     currentSession = null;
@@ -70,22 +67,25 @@ async function signOut() {
 
 // Check if user is admin
 async function checkIfAdmin(userId) {
-  const { data, error } = await supabase
+  const { data, error } = await _supabase
     .from('admins')
     .select('id')
     .eq('user_id', userId)
-    .single();
-  
-  if (error || !data) {
+    .maybeSingle(); // maybeSingle: no error if zero rows, unlike single()
+
+  if (error) {
+    // Log so a misconfigured RLS policy (e.g. infinite recursion) is visible
+    // in the console instead of silently failing as "not admin".
+    console.error('checkIfAdmin error:', error);
     return false;
   }
-  return true;
+  return !!data;
 }
 
 // Submit client request
 async function submitClientRequest(clientData) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await _supabase
       .from('client_requests')
       .insert([{
         user_id: currentUser.id,
@@ -107,7 +107,7 @@ async function submitClientRequest(clientData) {
 // Get all client requests (admin only)
 async function getAllClientRequests() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await _supabase
       .from('client_requests')
       .select('*')
       .order('created_at', { ascending: false });
@@ -124,7 +124,7 @@ async function getCurrentUserRequest() {
   if (!currentUser) return null;
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await _supabase
       .from('client_requests')
       .select('*')
       .eq('user_id', currentUser.id)
@@ -175,7 +175,7 @@ async function redirectIfLoggedIn(redirectUrl = '/client.html') {
 }
 
 // Listen for auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
+_supabase.auth.onAuthStateChange((event, session) => {
   currentSession = session;
   currentUser = session?.user || null;
   
@@ -198,7 +198,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 // Export functions for use in other scripts
 window.CometAuth = {
-  supabase,
+  supabase: _supabase,
   checkAuth,
   signUp,
   signIn,
