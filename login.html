@@ -277,7 +277,6 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-auth.js"></script>
   <script src="main.js"></script>
   <script>
@@ -326,7 +325,7 @@
     // Handle login
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const messageEl = document.getElementById('loginMessage');
@@ -334,18 +333,29 @@
       messageEl.style.display = 'none';
       messageEl.className = 'auth-form__message';
 
-      const result = await window.CometAuth.signIn(email, password);
+      try {
+        if (!window.CometAuth) {
+          throw new Error('Auth failed to load. Check your internet connection or ad blocker and refresh the page.');
+        }
 
-      if (result.success) {
-        messageEl.textContent = 'Login successful! Redirecting...';
-        messageEl.classList.add('auth-form__message--success');
-        messageEl.style.display = 'block';
-        
-        setTimeout(() => {
-          window.location.href = '/client.html';
-        }, 1000);
-      } else {
-        messageEl.textContent = result.error || 'Login failed. Please try again.';
+        const result = await window.CometAuth.signIn(email, password);
+
+        if (result.success) {
+          messageEl.textContent = 'Login successful! Redirecting...';
+          messageEl.classList.add('auth-form__message--success');
+          messageEl.style.display = 'block';
+
+          setTimeout(() => {
+            window.location.href = '/client.html';
+          }, 1000);
+        } else {
+          messageEl.textContent = result.error || 'Login failed. Please try again.';
+          messageEl.classList.add('auth-form__message--error');
+          messageEl.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        messageEl.textContent = err.message || 'Something went wrong. Check the browser console for details.';
         messageEl.classList.add('auth-form__message--error');
         messageEl.style.display = 'block';
       }
@@ -354,7 +364,7 @@
     // Handle signup
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const email = document.getElementById('signupEmail').value;
       const password = document.getElementById('signupPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
@@ -379,19 +389,42 @@
         return;
       }
 
-      const result = await window.CometAuth.signUp(email, password);
+      try {
+        if (!window.CometAuth) {
+          throw new Error('Auth failed to load. Check your internet connection or ad blocker and refresh the page.');
+        }
 
-      if (result.success) {
-        messageEl.textContent = 'Account created! Please check your email to verify your account, then sign in.';
-        messageEl.classList.add('auth-form__message--success');
-        messageEl.style.display = 'block';
-        
-        // Auto-switch to login after success
-        setTimeout(() => {
-          switchAuth.click();
-        }, 3000);
-      } else {
-        messageEl.textContent = result.error || 'Signup failed. Please try again.';
+        const result = await window.CometAuth.signUp(email, password);
+        console.log('Signup result:', result);
+
+        if (result.success) {
+          // If Supabase returns a session immediately, email confirmation is OFF
+          // in your project settings — the account is active right away and no
+          // email is sent. Otherwise a confirmation email was sent.
+          const emailConfirmationOff = !!result.data?.session;
+
+          messageEl.textContent = emailConfirmationOff
+            ? 'Account created and signed in! Redirecting...'
+            : 'Account created! Please check your email to verify your account, then sign in.';
+          messageEl.classList.add('auth-form__message--success');
+          messageEl.style.display = 'block';
+
+          if (emailConfirmationOff) {
+            setTimeout(() => { window.location.href = '/client.html'; }, 1000);
+          } else {
+            // Auto-switch to login after success
+            setTimeout(() => {
+              switchAuth.click();
+            }, 3000);
+          }
+        } else {
+          messageEl.textContent = result.error || 'Signup failed. Please try again.';
+          messageEl.classList.add('auth-form__message--error');
+          messageEl.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Signup error:', err);
+        messageEl.textContent = err.message || 'Something went wrong. Check the browser console for details.';
         messageEl.classList.add('auth-form__message--error');
         messageEl.style.display = 'block';
       }

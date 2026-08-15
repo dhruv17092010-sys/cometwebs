@@ -354,7 +354,6 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-auth.js"></script>
   <script src="main.js"></script>
   <script>
@@ -376,18 +375,25 @@
 
     // Check admin authentication on load
     async function init() {
-      const isAdmin = await window.CometAuth.requireAdmin('/index.html');
-      
-      if (!isAdmin) {
-        return;
+      try {
+        const isAdmin = await window.CometAuth.requireAdmin('/index.html');
+
+        if (!isAdmin) {
+          return;
+        }
+
+        // Show admin email
+        const user = window.CometAuth.getCurrentUser();
+        adminEmail.textContent = user.email;
+
+        // Load requests
+        await loadRequests();
+      } catch (err) {
+        // Surface the real error instead of just bouncing back to index.html.
+        // The most common cause is a Supabase error on the `admins` table
+        // query (e.g. a misconfigured RLS policy) — check the console.
+        console.error('Admin init error:', err);
       }
-
-      // Show admin email
-      const user = window.CometAuth.getCurrentUser();
-      adminEmail.textContent = user.email;
-
-      // Load requests
-      await loadRequests();
     }
 
     // Load all client requests
